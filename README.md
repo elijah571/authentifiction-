@@ -1,8 +1,5 @@
-Sure! Here's a sample `README.md` file for your project:
 
----
-
-# User Authentication & Management System
+ User Authentication & Management System
 
 This is a User Authentication and Management system built using **Express.js** and **MongoDB** with **JWT** for token-based authentication. The project supports user registration, login, password reset, account verification, role management (admin, shipper, carrier, user), and profile updates. The system has several protected routes based on user roles, including admin access for managing other users.
 
