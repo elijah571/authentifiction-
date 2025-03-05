@@ -1,0 +1,68 @@
+import jwt from 'jsonwebtoken';
+import { User } from '../model/users/user.js';
+
+// Middleware to check if user is authenticated
+export const isAuthenticateUser = async (req, res, next) => {
+    let token;
+
+    // Check if the token is provided in the cookies
+    if (req.cookies && req.cookies.token) {
+        token = req.cookies.token; 
+
+        if (!token) {
+            return res.status(401).json({ message: "Token is required" });
+        }
+
+        try {
+            // Verify the token using jwt.verify
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+            const user = await User.findById(decoded.userId);
+
+            if (!user) {
+                return res.status(404).json({ message: "User authentication not found" });
+            }
+
+            req.user = user;
+
+            next();
+        } catch (error) {
+            return res.status(401).json({ message: "Invalid or expired token" });
+        }
+    } else {
+        return res.status(401).json({ message: "Authorization token is missing" });
+    }
+};
+
+// Admin has full access to everything, including Shipper routes
+export const isAdmin = async (req, res, next) => {
+    const user = req.user;
+
+    if (user.role !== "Admin") {
+        return res.status(403).json({ message: "You do not have permission to access this resource" });
+    }
+
+    next(); 
+};
+
+//  Only allow Shippers access and admin
+export const isShipper = async (req, res, next) => {
+    const user = req.user;
+
+    if (user.role !== "Shipper" && user.role !== "Admin") {
+        return res.status(403).json({ message: "You do not have permission to access this resource" });
+    }
+
+    next();
+};
+
+//  Only allow Carriers access and  Admins access
+export const isCarrier = async (req, res, next) => {
+    const user = req.user;
+
+    if (user.role !== "Carrier" && user.role !== "Admin") {
+        return res.status(403).json({ message: "You do not have permission to access this resource" });
+    }
+
+    next();
+};

@@ -18,8 +18,7 @@ const userSchema = new mongoose.Schema(
     role: {
       type: String,
       default: "user",
-      enum: [ "Admin", "Shipper", "Carrier", "user"],
-      type: String,
+      enum: ["Admin", "Shipper", "Carrier", "user"],
     },
     verificationToken: {
       type: String,
@@ -31,13 +30,14 @@ const userSchema = new mongoose.Schema(
     },
     verificationTokenExpiresAt: {
       type: Date,
-      default: Date.now, 
+      default: Date.now,
     },
-    sendVerificationToken: {
+    // Add these two fields for password reset functionality
+    resetPasswordToken: {
       type: String,
       default: "",
     },
-    sendVerificationTokenExpiresAt: {
+    resetPasswordExpiresAt: {
       type: Date,
       default: Date.now,
     },
