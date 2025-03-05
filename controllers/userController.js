@@ -2,6 +2,7 @@ import { User } from "../model/users/user.js";
 import bcrypt from "bcryptjs";
 import validator from "validator";
 import { sendVerificationEmail } from "../utils/sendMail.js"; // Import email function
+import { generateToken } from "../utils/token.js";
 //create user account
 export const signUp = async (req, res) => {
     const { email, name, password } = req.body;
@@ -86,6 +87,36 @@ export const verifyAccount = async (req, res) => {
 
     } catch (error) {
         console.error("Error verifying account:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+//Login
+
+export const loginUser = async (req, res) => {
+    const { email, password } = req.body;
+    
+    try {
+        // Check if the user exists
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ message: "Email not found" });
+        }
+
+        // Check if the password is correct
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            return res.status(400).json({ message: "Invalid password" });
+        }
+
+        // Generate and set token
+        generateToken(res, user._id);
+
+        // Send user details (excluding password)
+        return res.status(200).json({
+            message: "Login successful", user});
+
+    } catch (error) {
+        console.error(error);
         return res.status(500).json({ message: "Internal server error" });
     }
 };
