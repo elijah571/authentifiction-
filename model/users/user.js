@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
-    // Add these two fields for password reset functionality
+  
     resetPasswordToken: {
       type: String,
       default: "",

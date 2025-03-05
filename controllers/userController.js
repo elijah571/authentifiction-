@@ -223,49 +223,48 @@ export const resetPassword = async (req, res) => {
     }
 };
 
+//Update User profile 
+
 export const updateProfile = async (req, res) => {
-    const { name, email, role } = req.body;
-    const userId = req.user.id; // Assuming `userId` is from the authenticated user (JWT)
+    const { name, email, role } = req.body; // name, email, and role are now in the request body
+    const { userId } = req.params;  // userId is now coming from the route parameters
 
     try {
-        // Validate that name and email are provided
-        if (!name || !email) {
-            return res.status(400).json({ message: "Name and email are required" });
-        }
-
-        // Validate email format
-        if (!validator.isEmail(email)) {
-            return res.status(400).json({ message: "Invalid email format" });
-        }
-
-        // Check if the role provided is valid (Admin, Shipper, Carrier, user)
-        const validRoles = ["Admin", "Shipper", "Carrier", "user"];
-        if (role && !validRoles.includes(role)) {
-            return res.status(400).json({ message: "Invalid role provided" });
-        }
-
         // Check if the user making the request is an admin (Only admins can update roles)
         if (role && req.user.role !== "Admin") {
             return res.status(403).json({ message: "Only admins can update roles" });
         }
 
-        // Check if the email is already in use by another user (ignore if updating own profile)
-        const existingUser = await User.findOne({ email });
-        if (existingUser && existingUser._id.toString() !== userId) {
-            return res.status(400).json({ message: "Email is already taken by another user" });
+        // Validate that role is provided if you want to update it
+        if (role) {
+            // Validate the provided role
+            const validRoles = ["Admin", "Shipper", "Carrier", "user"];
+            if (!validRoles.includes(role)) {
+                return res.status(400).json({ message: "Invalid role provided" });
+            }
         }
 
-        // Find the user and update the profile
+        // Find the user by userId in the URL parameters
         const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
 
-        // Update user details
-        user.name = name;
-        user.email = email;
+        // Update user details only if provided
+        if (name) {
+            user.name = name;
+        }
 
-        // If a new role is provided and valid, update the role
+        if (email) {
+            // Check if the email is already in use by another user (ignore if updating own profile)
+            const existingUser = await User.findOne({ email });
+            if (existingUser && existingUser._id.toString() !== userId) {
+                return res.status(400).json({ message: "Email is already taken by another user" });
+            }
+            user.email = email;
+        }
+
+        // If a new role is provided and the user is admin, update the role
         if (role) {
             user.role = role;
         }
@@ -277,5 +276,57 @@ export const updateProfile = async (req, res) => {
     } catch (error) {
         console.error("Error updating profile:", error);
         return res.status(500).json({ message: "Internal server error" });
+    }
+};
+// Get all user
+export const getAllUsers = async (req, res) => {
+    try {
+        const user = await User.find({})
+        if(!user) {
+            return res(400).json({message:"Users not found"})
+        }
+        res.status(200).json(user)
+    } catch (error) {
+        console.error(error)
+        return res.status(500).json({message:error.message})
+    }
+}
+// Get user by Id
+export const getUserById = async (req, res) => {
+    const { userId } = req.params;  // Correct way to access userId from the request params
+
+    try {
+        const user = await User.findById(userId);  // Find user by userId
+        if (!user) {
+            return res.status(404).json({ message: "User not Found" });  // Return 404 if user is not found
+        }
+        return res.status(200).json(user);  // Return user data if found
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: error.message });  // Return error message if an exception occurs
+    }
+};
+
+// Delete user by Id
+export const deleteUserbyId = async (req, res) => {
+    const { userId } = req.params;  // Accessing userId from request params
+
+    try {
+        const user = await User.findById(userId);  // Find the user by userId
+
+        // If user doesn't exist, return a 404 response
+        if (!user) {
+            return res.status(404).json({ message: "User not Found" });
+        }
+
+        // Delete the user
+        await user.deleteOne();  // Delete the user from the database
+
+        // Return a success response
+        return res.status(200).json({ message: "User deleted successfully" });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: error.message });  // Return error message if an exception occurs
     }
 };

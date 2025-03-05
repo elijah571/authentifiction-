@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs'; // For hashing the password
-import { User } from './model/users/user.js'; // Make sure this path is correct to your User model
+import bcrypt from 'bcryptjs';
+import { User } from './model/users/user.js'; 
 import dotenv from 'dotenv';
 
 // Load environment variables from a .env file
