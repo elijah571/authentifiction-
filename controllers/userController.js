@@ -2,7 +2,7 @@ import { User } from "../model/users/user.js";
 import bcrypt from "bcryptjs";
 import validator from "validator";
 import { sendVerificationEmail } from "../utils/sendMail.js"; // Import email function
-
+//create user account
 export const signUp = async (req, res) => {
     const { email, name, password } = req.body;
     try {
@@ -57,5 +57,35 @@ export const signUp = async (req, res) => {
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: error.message });
+    }
+};
+//verify account
+export const verifyAccount = async (req, res) => {
+    const { verificationToken } = req.body;
+
+    try {
+        // Find user with the provided token
+        const user = await User.findOne({ verificationToken });
+
+        if (!user) {
+            return res.status(400).json({ message: "Invalid or expired verification token" });
+        }
+
+        // Check if token has expired
+        if (user.verificationTokenExpiresAt < Date.now()) {
+            return res.status(400).json({ message: "Verification token has expired. Request a new one." });
+        }
+
+        // Mark user as verified
+        user.isVerified = true;
+        user.verificationToken = ""; // Clear token after successful verification
+        user.verificationTokenExpiresAt = null; // Optional: Clear expiration time
+        await user.save();
+
+        return res.status(200).json({ message: "Account verified successfully" });
+
+    } catch (error) {
+        console.error("Error verifying account:", error);
+        return res.status(500).json({ message: "Internal server error" });
     }
 };
