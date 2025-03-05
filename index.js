@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { connect } from "./config/connectDB.js";
+import { userRoute } from "./routes/userRoute.js";
 
 dotenv.config();
 
@@ -19,6 +20,8 @@ const PORT = process.env.PORT || 5000;
 app.get("/", (req, res) => {
   res.send("API is running...");
 });
+//api 
+app.use('/api/user', userRoute)
 connect()
 // Start server
 app.listen(PORT, () => {

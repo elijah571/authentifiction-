@@ -1,4 +1,4 @@
-export const verificationHtml = () => `
+export const verificationHtml = (verificationToken) => `
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -29,15 +29,15 @@ export const verificationHtml = () => `
                 font-size: 16px;
                 color: #555;
             }
-            .btn {
-                display: inline-block;
-                padding: 12px 20px;
-                margin-top: 20px;
+            .token-box {
+                font-size: 24px;
+                font-weight: bold;
                 background-color: #007bff;
                 color: #fff;
-                text-decoration: none;
+                display: inline-block;
+                padding: 10px 20px;
                 border-radius: 5px;
-                font-size: 16px;
+                margin-top: 15px;
             }
             .footer {
                 margin-top: 20px;
@@ -49,8 +49,8 @@ export const verificationHtml = () => `
     <body>
         <div class="container">
             <h2>Email Verification</h2>
-            <p>Thank you for signing up! Please verify your email by clicking the button below:</p>
-            <a href="${verificationLink}" class="btn">Verify Email</a>
+            <p>Thank you for signing up! Use the code below to verify your email:</p>
+            <div class="token-box">${verificationToken}</div>
             <p>If you did not request this, please ignore this email.</p>
             <p class="footer">© ${new Date().getFullYear()} Your Company. All rights reserved.</p>
         </div>
