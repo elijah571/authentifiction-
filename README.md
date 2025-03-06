@@ -47,6 +47,7 @@ This is a User Authentication and Management system built using **Express.js** a
 3. Create a `.env` file in the root of the project and add the following environment variables:
    ```env
    JWT_SECRET=your_jwt_secret
+   NODE_ENV=production
    MONGO_URI=your_mongodb_connection_string
    EMAIL_HOST=your_email_host
    EMAIL_PORT=your_email_port
