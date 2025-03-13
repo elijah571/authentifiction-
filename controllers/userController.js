@@ -1,9 +1,8 @@
 import { User } from "../model/users/user.js";
 import bcrypt from "bcryptjs";
 import validator from "validator";
-import { sendResetEmail, sendVerificationEmail } from "../utils/sendMail.js"; // Import email function
+import { sendResetEmail, sendVerificationEmail } from "../utils/sendMail.js"; 
 import { generateToken } from "../utils/token.js";
-//create user account
 export const signUp = async (req, res) => {
     const { email, name, password } = req.body;
     try {
@@ -33,7 +32,7 @@ export const signUp = async (req, res) => {
         }
 
         const hashPassword = await bcrypt.hash(password, 10);
-        const verificationToken = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit token
+        const verificationToken = Math.floor(100000 + Math.random() * 900000).toString(); 
         const verificationExpires = Date.now() + 1 * 60 * 60 * 1000;
 
         const user = new User({
@@ -79,8 +78,8 @@ export const verifyAccount = async (req, res) => {
 
         // Mark user as verified
         user.isVerified = true;
-        user.verificationToken = ""; // Clear token after successful verification
-        user.verificationTokenExpiresAt = null; // Optional: Clear expiration time
+        user.verificationToken = ""; 
+        user.verificationTokenExpiresAt = null; 
         await user.save();
 
         return res.status(200).json({ message: "Account verified successfully" });
@@ -124,7 +123,7 @@ export const loginUser = async (req, res) => {
 export const logoutUser = async (req, res) => {
     res.cookie("token", "", {
         httpOnly: true,
-        expires: new Date(0), // Expire the cookie immediately
+        expires: new Date(0), 
     });
 
     return res.status(200).json({ message: "Logged out successfully" });
@@ -141,15 +140,14 @@ export const resetPasswordToken = async (req, res) => {
         }
 
         // Generate a new reset password token
-        const resetToken = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit code
-        const resetTokenExpiresAt = Date.now() + 1 * 60 * 60 * 1000; // 1-hour expiration
-
+        const resetToken = Math.floor(100000 + Math.random() * 900000).toString(); 
+        const resetTokenExpiresAt = Date.now() + 1 * 60 * 60 * 1000; 
         // Update user with reset token and expiration
         user.resetPasswordToken = resetToken;
         user.resetPasswordExpiresAt = resetTokenExpiresAt;
 
         // Save the user with the new token
-        await user.save();  // Make sure you call `save` after modifying the fields
+        await user.save(); 
 
         // Send reset password email
         await sendResetEmail(email, resetToken);
@@ -163,8 +161,8 @@ export const resetPasswordToken = async (req, res) => {
 };
 
 export const resetPassword = async (req, res) => {
-    const { userId } = req.params;  // Get the userId from req.params
-    const { resetToken, newPassword } = req.body;  // Get the reset token and new password from the body
+    const { userId } = req.params;  
+    const { resetToken, newPassword } = req.body;  
 
     try {
         // Check if the userId, resetToken, and newPassword are provided
@@ -226,8 +224,8 @@ export const resetPassword = async (req, res) => {
 //Update User profile 
 
 export const updateProfile = async (req, res) => {
-    const { name, email, role } = req.body; // name, email, and role are now in the request body
-    const { userId } = req.params;  // userId is now coming from the route parameters
+    const { name, email, role } = req.body;
+    const { userId } = req.params; 
 
     try {
         // Check if the user making the request is an admin (Only admins can update roles)
@@ -235,7 +233,6 @@ export const updateProfile = async (req, res) => {
             return res.status(403).json({ message: "Only admins can update roles" });
         }
 
-        // Validate that role is provided if you want to update it
         if (role) {
             // Validate the provided role
             const validRoles = ["Admin", "Shipper", "Carrier", "user"];
@@ -256,7 +253,7 @@ export const updateProfile = async (req, res) => {
         }
 
         if (email) {
-            // Check if the email is already in use by another user (ignore if updating own profile)
+          
             const existingUser = await User.findOne({ email });
             if (existingUser && existingUser._id.toString() !== userId) {
                 return res.status(400).json({ message: "Email is already taken by another user" });
@@ -264,7 +261,7 @@ export const updateProfile = async (req, res) => {
             user.email = email;
         }
 
-        // If a new role is provided and the user is admin, update the role
+      
         if (role) {
             user.role = role;
         }
@@ -293,26 +290,25 @@ export const getAllUsers = async (req, res) => {
 }
 // Get user by Id
 export const getUserById = async (req, res) => {
-    const { userId } = req.params;  // Correct way to access userId from the request params
+    const { userId } = req.params;  
 
     try {
-        const user = await User.findById(userId);  // Find user by userId
+        const user = await User.findById(userId); 
         if (!user) {
-            return res.status(404).json({ message: "User not Found" });  // Return 404 if user is not found
+            return res.status(404).json({ message: "User not Found" }); 
         }
-        return res.status(200).json(user);  // Return user data if found
+        return res.status(200).json(user); 
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: error.message });  // Return error message if an exception occurs
+        return res.status(500).json({ message: error.message });  
     }
 };
 
 // Delete user by Id
 export const deleteUserbyId = async (req, res) => {
-    const { userId } = req.params;  // Accessing userId from request params
-
+    const { userId } = req.params;  
     try {
-        const user = await User.findById(userId);  // Find the user by userId
+        const user = await User.findById(userId);  
 
         // If user doesn't exist, return a 404 response
         if (!user) {
@@ -320,13 +316,13 @@ export const deleteUserbyId = async (req, res) => {
         }
 
         // Delete the user
-        await user.deleteOne();  // Delete the user from the database
+        await user.deleteOne();
 
         // Return a success response
         return res.status(200).json({ message: "User deleted successfully" });
 
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: error.message });  // Return error message if an exception occurs
+        return res.status(500).json({ message: error.message });  
     }
 };

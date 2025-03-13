@@ -15,7 +15,6 @@ userRoute.post('/logout', logoutUser)
 userRoute.post('/resetToken', isAuthenticateUser, resetPasswordToken)
 //reset Password
 userRoute.put('/reset-password/:userId',isAuthenticateUser,  resetPassword);
-//update user and assign role by admin
 // Route to update a user's profile and assign a role (only accessible to admin)
 userRoute.put('/update-user-role/:userId', isAuthenticateUser, isAdmin, updateProfile); 
 //Get All users

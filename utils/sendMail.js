@@ -16,7 +16,7 @@ export const sendVerificationEmail = async (email, verificationToken) => {
             from: process.env.EMAIL_USER,
             to: email,
             subject: "Your Email Verification Code",
-            html: verificationHtml(verificationToken), // Pass token instead of a link
+            html: verificationHtml(verificationToken), 
         };
 
         const info = await transporter.sendMail(mailOptions);
@@ -44,7 +44,7 @@ export const sendResetEmail = async (email, sendVerificationToken) => {
             from: process.env.EMAIL_USER,
             to: email,
             subject: "Your Email Verification Code",
-            html: resetPasswordHtml(sendVerificationToken), // Pass token instead of a link
+            html: resetPasswordHtml(sendVerificationToken), 
         };
 
         const info = await transporter.sendMail(mailOptions);
